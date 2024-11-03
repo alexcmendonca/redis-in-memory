@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Gamificado de Quiz com Redis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .question, .feedback, .rankings {
+            margin-top: 20px;
+        }
+        .feedback {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema Gamificado de Quiz com Redis</h1>
+        
+        <!-- Tela de início -->
+        <div id="start-screen">
+            <label for="student-name">Digite seu nome ou apelido:</label>
+            <input type="text" id="student-name" placeholder="Seu nome" required>
+            <button onclick="startQuiz()">Iniciar Quiz</button>
+        </div>
+        
+        <!-- Tela do quiz -->
+        <div id="quiz-screen" style="display: none;">
+            <div id="question-container"></div>
+            <button onclick="submitAnswer()">Enviar Resposta</button>
+        </div>
+        
+        <!-- Feedback de erro -->
+        <div id="feedback" class="feedback" style="display: none;"></div>
+    </div>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let studentName = '';
+        let questions = [];
+        const quizId = '1';
+
+        async function startQuiz() {
+            studentName = document.getElementById('student-name').value.trim();
+            if (!studentName) {
+                alert('Por favor, insira seu nome.');
+                return;
+            }
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/get_questions?quiz_id=${quizId}`);
+                if (!response.ok) throw new Error('Erro ao buscar perguntas');
+                questions = await response.json();
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('quiz-screen').style.display = 'block';
+                showQuestion();
+            } catch (error) {
+                console.error('Erro ao buscar perguntas:', error);
+                document.getElementById('feedback').innerText = 'Erro ao carregar perguntas. Tente novamente mais tarde.';
+                document.getElementById('feedback').style.display = 'block';
+            }
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                alert('Quiz concluído!');
+                document.getElementById('feedback').innerText = 'Parabéns, você concluiu o quiz!';
+                return;
+            }
+            const question = questions[currentQuestionIndex];
+            const questionContainer = document.getElementById('question-container');
+            questionContainer.innerHTML = `
+                <div class="question">
+                    <h2>${question.pergunta}</h2>
+                    ${Object.entries(question.options).map(([key, value]) => `
+                        <label>
+                            <input type="radio" name="option" value="${key}">
+                            ${key}: ${value}
+                        </label><br>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function submitAnswer() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+            if (!selectedOption) {
+                alert('Por favor, selecione uma resposta.');
+                return;
+            }
+
+            const answer = selectedOption.value;
+            const questionId = questions[currentQuestionIndex].id;
+
+            // Logs de depuração para verificar os valores antes de enviar a requisição
+            console.log("Enviando resposta com os seguintes dados:");
+            console.log("Quiz ID:", quizId);
+            console.log("Student ID:", studentName);
+            console.log("Question ID:", questionId);
+            console.log("Selected Option:", answer);
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/submit_response`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quiz_id: quizId,           // Certifique-se de que `quizId` é uma string
+                        student_id: studentName,   // Certifique-se de que `studentName` é uma string
+                        question_id: questionId,   // Certifique-se de que `questionId` é uma string
+                        selected_option: answer,   // Certifique-se de que `answer` é uma string
+                        response_time: 20          // Certifique-se de que `response_time` é um número
+                    })
+                });
+
+                if (!response.ok) throw new Error('Erro ao enviar resposta');
+
+                const data = await response.json();
+                console.log("Resposta registrada:", data);
+                currentQuestionIndex++;
+                showQuestion();
+            } catch (error) {
+                console.error('Erro ao enviar resposta:', error);
+                document.getElementById('feedback').innerText = 'Erro ao enviar resposta. Tente novamente.';
+                document.getElementById('feedback').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Estatísticas do Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerenciador de Estatísticas do Quiz</h1>
+
+        <!-- Botões de consulta -->
+        <div class="buttons">
+            <button onclick="getMostVotedOption()">Opção Mais Votada</button>
+            <button onclick="getMostCorrectQuestions()">Questão com Mais Acertos</button>
+            <button onclick="getQuestionsWithMostAbstentions()">Questão com Mais Abstenções</button>
+            <button onclick="getAverageResponseTime()">Tempo Médio de Resposta</button>
+            <button onclick="getStudentsWithMostCorrectAnswers()">Aluno com Mais Acertos</button>
+            <button onclick="getFastestStudents()">Aluno Mais Rápido</button>
+        </div>
+
+        <!-- Área para exibir os resultados -->
+        <div id="results">
+            <h2>Resultado da Consulta</h2>
+            <pre id="results-content">Selecione uma consulta para ver os resultados.</pre>
+        </div>
+    </div>
+
+    <script>
+        // Função para exibir os resultados na página
+        function displayResult(result) {
+            const resultsContent = document.getElementById('results-content');
+            resultsContent.textContent = JSON.stringify(result, null, 2);
+        }
+
+        // Funções para consultar o backend
+        const quizId = '1';  // ID do quiz de exemplo
+
+        async function getMostVotedOption() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/quiz/${quizId}/questions/q1/most_voted`);
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                console.error("Erro ao obter opção mais votada:", error);
+            }
+        }
+
+        async function getMostCorrectQuestions() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/quiz/${quizId}/most_correct_questions`);
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                console.error("Erro ao obter questão com mais acertos:", error);
+            }
+        }
+
+        async function getQuestionsWithMostAbstentions() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/quiz/${quizId}/questions_with_most_abstentions`);
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                console.error("Erro ao obter questão com mais abstenções:", error);
+            }
+        }
+
+        async function getAverageResponseTime() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/quiz/${quizId}/average_response_time`);
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                console.error("Erro ao obter tempo médio de resposta:", error);
+            }
+        }
+
+        async function getStudentsWithMostCorrectAnswers() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/quiz/${quizId}/students_with_most_correct_answers`);
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                console.error("Erro ao obter aluno com mais acertos:", error);
+            }
+        }
+
+        async function getFastestStudents() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/quiz/${quizId}/fastest_students`);
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                console.error("Erro ao obter aluno mais rápido:", error);
+            }
+        }
+    </script>
+</body>
+</html>

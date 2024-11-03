@@ -1,0 +1,114 @@
+{
+    "info": {
+        "name": "Quiz API Collection",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Start Quiz",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://127.0.0.1:8000/create_quiz",
+                    "protocol": "http",
+                    "host": [
+                        "127.0.0.1"
+                    ],
+                    "port": "8000",
+                    "path": [
+                        "create_quiz"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"quiz_id\": \"1\", \"title\": \"Sample Quiz\", \"description\": \"This is a sample quiz\"}"
+                }
+            }
+        },
+        {
+            "name": "Add Question",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://127.0.0.1:8000/add_question",
+                    "protocol": "http",
+                    "host": [
+                        "127.0.0.1"
+                    ],
+                    "port": "8000",
+                    "path": [
+                        "add_question"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"quiz_id\": \"1\", \"question_id\": \"1\", \"text\": \"What is the capital of France?\", \"options\": {\"A\": \"Paris\", \"B\": \"London\", \"C\": \"Berlin\", \"D\": \"Madrid\"}}"
+                }
+            }
+        },
+        {
+            "name": "Record Response",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://127.0.0.1:8000/record_response",
+                    "protocol": "http",
+                    "host": [
+                        "127.0.0.1"
+                    ],
+                    "port": "8000",
+                    "path": [
+                        "record_response"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"quiz_id\": \"1\", \"student_id\": \"student_1\", \"question_id\": \"1\", \"selected_option\": \"A\"}"
+                }
+            }
+        },
+        {
+            "name": "Get Rankings",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://127.0.0.1:8000/rankings/most_correct_questions?quiz_id=1",
+                    "protocol": "http",
+                    "host": [
+                        "127.0.0.1"
+                    ],
+                    "port": "8000",
+                    "path": [
+                        "rankings",
+                        "most_correct_questions"
+                    ],
+                    "query": [
+                        {
+                            "key": "quiz_id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
